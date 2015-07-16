@@ -37,6 +37,10 @@ Tptr.sources.gravatar = new Tptr.TapatarSource({
     this.downloadImage(url, function(dataUri){
         if (dataUri) {
           self.setImageData(dataUri);
+        } else {
+          try {
+            self.delegate.options.sources.gravatar.enabled = false;
+          } catch(err) {}
         }
     })
   },

@@ -1,4 +1,4 @@
-;(function ($, window, document, undefined ) {
+;(function ($, window, document, undefined) {
     "use strict";
 
     window.Tptr = window.Tptr || {};
@@ -7,7 +7,11 @@
     var sourceDefaults = {
         id: 'unknown',
         title: 'Unknown',
-        icon: 'img/source.svg',
+        icon: function() {
+            var fileName = (this.id !== 'unknown') ? this.id + '.svg' : 'source.svg';
+
+            return this.delegate.options.image_base_path + fileName;
+        },
         image_data: null,
         delegate: null
     };
@@ -20,6 +24,10 @@
     TapatarSource.prototype.setImageData = function(data, pick) {
         this.image_data = data;
         this.delegate.imageDataSet(this, pick);
+    };
+
+    TapatarSource.prototype.pick = function() {
+        this.delegate.pickSource(this);
     };
 
     TapatarSource.prototype.downloadImage = function(url, callback) {
@@ -38,7 +46,9 @@
             }
             var data = binaryString.join('');
             var base64 = window.btoa(data);
-            callback("data:image/png;base64,"+base64);
+            callback("data:image/png;base64,"+base64, 'success');
+          } else {
+            callback(null, 'error', this.status);
           }
         };
 

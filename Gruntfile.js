@@ -9,7 +9,7 @@ module.exports = function(grunt) {
                 separator: ';',
             },
             dist: {
-                src: ['src/tapatar-source.js', 'src/sources/*.js', 'src/tapatar.js'],
+                src: ['license.txt', 'src/tapatar-source.js', 'src/sources/*.js', 'src/tapatar.js'],
                 dest: 'dist/<%= pkg.codename %>.js'
             }
         },
@@ -69,7 +69,7 @@ module.exports = function(grunt) {
         },
         watch: {
           scripts: {
-            files: ['src/*', 'src/sources/*'],
+            files: ['src/*', 'src/sources/*', 'src/img/*'],
             tasks: ['concat', 'copy', 'uglify', 'less'],
             options: {
               spawn: false,

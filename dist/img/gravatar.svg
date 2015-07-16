@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="134px" height="134px"
+	 viewBox="13 13 134 134" enable-background="new 13 13 134 134" xml:space="preserve">
+<title>gravatar</title>
+<desc>Created with Sketch.</desc>
+<g id="Page-1_1_" sketch:type="MSPage">
+	<g id="gravatar_1_" transform="translate(-46.000000, -64.000000)" sketch:type="MSArtboardGroup">
+		<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="59" y1="144" x2="193" y2="144">
+			<stop  offset="0" style="stop-color:#5A8FB3"/>
+			<stop  offset="0.2308" style="stop-color:#5996B3"/>
+			<stop  offset="0.5623" style="stop-color:#57A9B3"/>
+			<stop  offset="0.953" style="stop-color:#53C8B4"/>
+			<stop  offset="1" style="stop-color:#52CCB4"/>
+		</linearGradient>
+		<path fill="url(#SVGID_1_)" d="M126,211c-36.944,0-67-30.056-67-67c0-17.867,6.996-34.992,19.72-48.316
+			c0.721-0.488,1.565-0.753,2.419-0.753c0.977,0,1.783,0.331,2.398,0.983l0.235,0.244c0.703,0.708,0.795,1.566,0.788,2.014
+			c-0.01,0.583-0.19,1.096-0.482,1.372l-0.184,0.177C71.71,111.676,65,127.401,65,144c0,33.636,27.364,61,61,61s61-27.364,61-61
+			c0-25.81-16.25-57.25-58-61.953v0.119V136c0,1.654-1.346,3-3,3s-3-1.346-3-3V80c0-1.027,0.478-1.721,0.879-2.122
+			S124.973,77,126,77c36.944,0,67,30.056,67,67C193,180.944,162.944,211,126,211z"/>
+	</g>
+</g>
+</svg>

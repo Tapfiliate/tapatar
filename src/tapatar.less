@@ -2,14 +2,11 @@
 @tptr-color-white: #fdfdfd;
 @tptr-color-gray-bg: #f9f9f9;
 @tptr-color-gray-accent: #ebebeb;
+@tptr-color-gray-dark: #999;
 @tptr-color-overlay: rgba(0,0,0,0.7);
 @tptr-color-success: #37d1b3;
 @tptr-color-textcolor: #666;
 @tptr-breakpoint: 760px;
-
-.tptr-round {
-    border-radius: 50%;
-}
 
 .tptr-bordered {
     border: 2px solid @tptr-color-gray-accent;
@@ -22,10 +19,29 @@
 }
 
 .tptr-widget {
+    font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     height: 70px;
+    width: 70px;
+    border-radius: 35px;
+    -webkit-border-radius: 35px;
+    -moz-border-radius: 35px;
+    background-size: cover;
+    display: block;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
 
-    img {
-        max-height: 100%;
+    .tptr-widget-pick {
+        display: block;
+        text-align: center;
+        background-color: rgba(0, 0, 0, 0.4);
+        color: white;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 0 0 6px;
+        font-weight: 300;
     }
 }
 
@@ -67,20 +83,23 @@
                 justify-content: center;
 
         .tptr-picker {
-            display: -webkit-box;
-            display: -moz-box;
-            display: box;
+            .tptr-flex();
+            position: relative;
+            -webkit-flex-direction: row;
+                -ms-flex-direction: row;
+                    flex-direction: row;
 
             @media(max-width: @tptr-breakpoint) {
-                -webkit-box-orient: vertical;
-                -moz-box-orient: vertical;
-                box-orient: vertical;
+                -webkit-flex-direction: column;
+                -ms-flex-direction: column;
+                flex-direction: column;
             }
 
+            width: 800px;
             margin: 20px;
             font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+            font-weight: 300;
             border-radius: 4px;
-            width: 800px;
 
             @media(max-width: @tptr-breakpoint) {
                 min-width: 320px;
@@ -99,9 +118,9 @@
 
                 @media(max-width: @tptr-breakpoint) {
                     width: 100%;
-                    -webkit-box-ordinal-group: 3;
-                    -moz-box-ordinal-group: 3;
-                    box-ordinal-group: 3;
+                    -webkit-order: 3;
+                    -ms-flex-order: 3;
+                    order: 3;
                 }
 
                 a {
@@ -111,6 +130,10 @@
 
                 .tptr-big-image {
                     width: 100%;
+                    height: 0;
+                    padding-top: 100%;
+                    background-size: cover;
+                    display: block;
                 }
             }
 
@@ -126,9 +149,9 @@
 
                 @media(max-width: @tptr-breakpoint) {
                     width: 100%;
-                    -webkit-box-ordinal-group: 2;
-                    -moz-box-ordinal-group: 2;
-                    box-ordinal-group: 2;
+                    -webkit-order: 2;
+                    -ms-flex-order: 2;
+                    order: 2;
                 }
 
                 .tptr-sources {
@@ -173,18 +196,20 @@
 
                     .tptr-source-pick {
                         width:75px;
-                        background-color: @tptr-color-success;
+                        background-color: @tptr-color-gray-dark;
                         color: @tptr-color-white;
                     }
 
                     .tptr-source-image-preview {
                         width: @source-height;
-
                         padding: 0;
 
-                        img {
-                            max-width: 100%;
-                            max-height: 100%;
+                        div {
+                            width: @source-height;
+                            height: 0;
+                            padding-top: 100%;
+                            background-size: cover;
+                            display: block;
                         }
                     }
                 }
@@ -205,11 +230,24 @@
                     }
 
                     &.tptr-save {
-                        padding: 0 20px;
-                        position: absolute;
-                        bottom: @box-padding;
-                        right: @box-padding;
+                        width:75px;
+                        float: right;
                     }
+                }
+            }
+
+            .tptr-close {
+                position: absolute;
+                top: 15px;
+                right: @box-padding / 4;
+                font-weight: 100;
+                z-index: 1;
+                line-height: 0;
+                font-size: 20px;
+                cursor: pointer;
+
+                &:before {
+                    content: "x";
                 }
             }
         }

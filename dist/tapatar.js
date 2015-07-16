@@ -1,4 +1,10 @@
-;(function ($, window, document, undefined ) {
+/**
+  * Tapatar - 0.1
+  * Copyright © 2015 Tapfiliate B.V.
+  * Licensed under the MIT license.
+  * https://tapfiliate.com/open-source/tapatar/
+  */
+;;(function ($, window, document, undefined) {
     "use strict";
 
     window.Tptr = window.Tptr || {};
@@ -7,7 +13,11 @@
     var sourceDefaults = {
         id: 'unknown',
         title: 'Unknown',
-        icon: 'img/source.svg',
+        icon: function() {
+            var fileName = (this.id !== 'unknown') ? this.id + '.svg' : 'source.svg';
+
+            return this.delegate.options.image_base_path + fileName;
+        },
         image_data: null,
         delegate: null
     };
@@ -20,6 +30,10 @@
     TapatarSource.prototype.setImageData = function(data, pick) {
         this.image_data = data;
         this.delegate.imageDataSet(this, pick);
+    };
+
+    TapatarSource.prototype.pick = function() {
+        this.delegate.pickSource(this);
     };
 
     TapatarSource.prototype.downloadImage = function(url, callback) {
@@ -38,7 +52,9 @@
             }
             var data = binaryString.join('');
             var base64 = window.btoa(data);
-            callback("data:image/png;base64,"+base64);
+            callback("data:image/png;base64,"+base64, 'success');
+          } else {
+            callback(null, 'error', this.status);
           }
         };
 
@@ -47,6 +63,78 @@
 
     Tptr.TapatarSource = TapatarSource;
 })(jQuery, window, document);
+;var Tptr = Tptr || {};
+Tptr.sources = Tptr.sources || {};
+Tptr.sources.facebook = new Tptr.TapatarSource({
+  id: 'facebook',
+  title: 'Facebook',
+  action: {
+    content: 'Get',
+    onClick: function(evt) {
+      var self = this;
+
+      if (self.imageLoaded) {
+        self.pick();
+
+        return;
+      }
+
+      if (self.fbStatus === 'connected') {
+          getPicture(true);
+      } else {
+          FB.login(function(){
+            getPicture(true);
+          });
+      }
+
+      function getPicture(set) {
+        FB.api('/me/picture?type=large', function(response) {
+          self.downloadImage(response.data.url, function(dataUri){
+              if (dataUri) {
+                self.setImageData(dataUri, set);
+                self.imageLoaded = true
+              } else {
+                try {
+                  self.delegate.options.sources.gravatar.enabled = false;
+                } catch(err) {}
+              }
+          })
+        });
+      }
+    }
+  },
+  onAdd: function() {
+    var self = this;
+    window.fbAsyncInit = function() {
+      if (!self.delegate.options.sources.facebook.appId) {
+        this.delegate.options.sources.facebook.enabled = false;
+        return;
+      }
+
+      FB.init({
+        appId      : self.delegate.options.sources.facebook.appId,
+        xfbml      : true,
+        version    : 'v2.3'
+      });
+
+      FB.getLoginStatus(function(response) {
+        self.fbStatus = response.status;
+
+        // if (self.fbStatus === 'connected') {
+        //   getPicture();
+        // }
+      });
+    };
+
+    (function(d, s, id){
+       var js, fjs = d.getElementsByTagName(s)[0];
+       if (d.getElementById(id)) {return;}
+       js = d.createElement(s); js.id = id;
+       js.src = "https://connect.facebook.net/en_US/sdk.js";
+       fjs.parentNode.insertBefore(js, fjs);
+     }(document, 'script', 'facebook-jssdk'));
+  },
+});
 ;var Tptr = Tptr || {};
 Tptr.sources = Tptr.sources || {};
 Tptr.sources.gravatar = new Tptr.TapatarSource({
@@ -86,6 +174,10 @@ Tptr.sources.gravatar = new Tptr.TapatarSource({
     this.downloadImage(url, function(dataUri){
         if (dataUri) {
           self.setImageData(dataUri);
+        } else {
+          try {
+            self.delegate.options.sources.gravatar.enabled = false;
+          } catch(err) {}
         }
     })
   },
@@ -103,7 +195,7 @@ Tptr.sources.local = new Tptr.TapatarSource({
   },
   onAdd: function() {
     var self = this;
-    this.fileInput = $('<input type="file" style="display:none;">');
+    this.fileInput = $('<input type="file" style="display:none;" accept=".png,.jpeg,.jpg,.gif">');
     function handleFileSelect(evt) {
       var files = evt.target.files;
 
@@ -140,14 +232,18 @@ Tptr.sources.local = new Tptr.TapatarSource({
         defaults = {
             sources: {
                 local: {enabled: true, order: 1},
-                gravatar: {enabled: true, order: 2}
+                facebook: {enabled: true, order: 2},
+                gravatar: {enabled: true, order: 3}
             },
-            image_url: 'img/default.svg',
+            image_base_path: 'img/',
+            default_image: function() {
+                return this.image_base_path + 'default.svg';
+            },
             templates: {
-                widget: '<div class="tptr-widget"><img class="tptr-round tptr-bordered" src="%image_url%"></div>',
+                widget: '<div class="tptr-widget"><span class="tptr-widget-pick">pick</span></div>',
                 overlay: '<div class="tptr-container" style="display: none"><div class="tptr-overlay"></div></div>',
-                picker: '<div class="tptr-picker"><div class="tptr-image-holder tptr-box-part"><img class="tptr-big-image" /></div><div class="tptr-sources-holder tptr-box-part"><div class="tptr-sources"></div><button class="tptr-save">Save</button></div></div>',
-                source: '<div class="tptr-source"><div class="tptr-source-part tptr-source-icon"><img alt="%source_title%" /></div><div class="tptr-source-part tptr-source-content">%source_title%</div><div class="tptr-source-part tptr-source-image-preview"></div><button class="tptr-source-part tptr-source-pick">Pick</button></div>'
+                picker: '<div class="tptr-picker"><div class="tptr-close"></div><div class="tptr-image-holder tptr-box-part"><div class="tptr-big-image"> </div></div><div class="tptr-sources-holder tptr-box-part"><div class="tptr-sources"></div><button class="tptr-save">Save</button></div></div>',
+                source: '<div class="tptr-source"><div class="tptr-source-part tptr-source-icon"><img /></div><div class="tptr-source-part tptr-source-content"></div><div class="tptr-source-part tptr-source-image-preview"></div><button class="tptr-source-part tptr-source-pick">Pick</button></div>'
             }
         };
 
@@ -183,17 +279,19 @@ Tptr.sources.local = new Tptr.TapatarSource({
             this.$tptrEl = $(this.element).parent();
             var $innerEl = $('<div class="tptr-inner"></div>');
             this.$tptrEl.append('<div class="tptr-inner"></div>');
-            var $innerEl = this.$tptrEl.children($innerEl);
+            var $innerEl = this.$tptrEl.find('.tptr-inner');
 
             var self = this;
 
             // Set the widget image
-            var widgetTemplate = this.options.templates.widget;
-            widgetTemplate = widgetTemplate.replace(/%image_url%/g, this.options.image_url);
+            var $widgetTemplate = $(this.options.templates.widget);
+            $widgetTemplate.css('background-image', 'url(' + this._getImageFromPathOrFunction(this.options.default_image, this.options) + ')');
+
+            this._registerHandlers();
 
             // Add the widget and attach the click handler
             $innerEl
-                .html(widgetTemplate)
+                .html($widgetTemplate)
                 .on('click', function(){
                     self._popPicker();
                 });
@@ -206,16 +304,46 @@ Tptr.sources.local = new Tptr.TapatarSource({
 
             if (source.onAdd) source.onAdd();
         },
+        pickSource: function(source) {
+            this.selectedSource = source.id;
+            this._setPickedImage(source);
+        },
         imageDataSet: function(source, pick) {
             this._updateSourceUi(source);
-            if (pick === true) {
-                this.selectedSource = source.id;
-                this._setPickedImage(source);
-            }
+            if (pick === true) this.pickSource(source);
+        },
+        _registerHandlers: function() {
+            var self = this;
+
+            // Register click handler for the sources' pick buttons and image preview
+            $(document).on('click', '.tptr-source-image-preview', function(){
+                var sourceId = $(this).parents('[data-source-id]').data('source-id');
+                self.selectedSource = sourceId;
+                self._setPickedImage(self.sources[sourceId]);
+            });
+
+            // Register click handler for the save button
+            $(document).on('click', '.tptr-save', function() {
+                self._save();
+            });
+
+            // Register click handler for the save button
+            $(document).on('click', '.tptr-close', function() {
+                self._closePicker();
+            });
+
+            $(document).on('keyup', function(e) {
+                if (e.keyCode == 27) { self._closePicker() }
+            });
+        },
+        _getImageFromPathOrFunction: function(prop, context) {
+            if (typeof prop == 'function') return $.proxy(prop, context)();
+
+            return prop;
         },
         _setPickedImage: function(source) {
             if (!source.image_data) return;
-            this.$containerEl.find('.tptr-image-holder img').attr('src', source.image_data)
+            this.$containerEl.find('.tptr-image-holder .tptr-big-image').css('background-image', 'url(' + source.image_data + ')');
         },
         _popPicker: function() {
             var sources = '';
@@ -223,8 +351,8 @@ Tptr.sources.local = new Tptr.TapatarSource({
             var $picker = $(this.options.templates.picker);
             var imageData = (this.selectedSource)
                                 ? this.sources[this.selectedSource].image_data
-                                : this.options.image_url;
-            $picker.find('.tptr-big-image').attr('src', imageData);
+                                : this._getImageFromPathOrFunction(this.options.default_image, this.options);
+            $picker.find('.tptr-big-image').css('background-image', 'url(' + imageData + ')');
 
             // Sort sources and append
             var $sourcesHolder = $picker.find('.tptr-sources');
@@ -249,28 +377,20 @@ Tptr.sources.local = new Tptr.TapatarSource({
 
             var self = this;
 
-            // Register click handler for the sources' pick buttons and image preview
-            $(document).on('click', '.tptr-source-image-preview', function(){
-                var sourceId = $(this).parents('[data-source-id]').data('source-id');
-                self.selectedSource = sourceId;
-                self._setPickedImage(self.sources[sourceId]);
-            });
-
-            // Register click handler for the save button
-            $(document).on('click', '.tptr-save', function() {
-                self._save();
-            });
-
             this.pickerActive = true;
             $overlay.fadeIn();
             this.$containerEl = $overlay;
             this._updateAllSourcesUi();
         },
+        _closePicker: function() {
+            this.$containerEl.fadeOut(function(){ $(this).remove() });
+        },
         _buildSource: function(source) {
-            var $el = $(this.options.templates.source.replace(/%source_title%/g, source.title));
+            var $el = $(this.options.templates.source);
+            $el.find('.tptr-source-content').html(source.title);
             $el.attr('data-source-id', source.id);
 
-            $el.find('.tptr-source-icon img').attr('src', source.icon);
+            $el.find('.tptr-source-icon img').attr('src', this._getImageFromPathOrFunction(source.icon, source));
 
             var $pickEl = $el.find('.tptr-source-pick');
 
@@ -301,13 +421,13 @@ Tptr.sources.local = new Tptr.TapatarSource({
         _setPreviewImage: function(source) {
             if (!source.image_data) return;
 
-            var img = $('<img src="' + source.image_data + '">');
-            this._getSourceEl(source).find('.tptr-source-image-preview').html(img);
+            this._getSourceEl(source).find('.tptr-source-image-preview').html($('<div></div>').css('background-image', 'url(' + source.image_data + ')'));
         },
         _save: function() {
-            $(this.element).val(this.sources[this.selectedSource].image_data);
-            this.$tptrEl.find('.tptr-widget img').attr('src', this.sources[this.selectedSource].image_data);
-            this.$containerEl.fadeOut().remove();
+            var imgData = this.sources[this.selectedSource].image_data;
+            $(this.element).val(imgData);
+            this.$tptrEl.find('.tptr-widget').css('background-image', 'url(' + imgData + ')');
+            this._closePicker();
         }
     };
 
