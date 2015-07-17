@@ -10,7 +10,7 @@
         icon: function() {
             var fileName = (this.id !== 'unknown') ? this.id + '.svg' : 'source.svg';
 
-            return this.delegate.options.image_base_path + fileName;
+            return this.delegate.options.image_url_prefix + fileName;
         },
         image_data: null,
         delegate: null

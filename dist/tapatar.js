@@ -16,7 +16,7 @@
         icon: function() {
             var fileName = (this.id !== 'unknown') ? this.id + '.svg' : 'source.svg';
 
-            return this.delegate.options.image_base_path + fileName;
+            return this.delegate.options.image_url_prefix + fileName;
         },
         image_data: null,
         delegate: null
@@ -235,9 +235,9 @@ Tptr.sources.local = new Tptr.TapatarSource({
                 facebook: {enabled: true, order: 2},
                 gravatar: {enabled: true, order: 3}
             },
-            image_base_path: 'img/',
+            image_url_prefix: 'img/',
             default_image: function() {
-                return this.image_base_path + 'default.svg';
+                return this.image_url_prefix + 'default.svg';
             },
             templates: {
                 widget: '<div class="tptr-widget"><span class="tptr-widget-pick">pick</span></div>',
