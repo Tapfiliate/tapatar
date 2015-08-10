@@ -30,7 +30,7 @@ Tptr.sources.facebook = new Tptr.TapatarSource({
                 self.imageLoaded = true
               } else {
                 try {
-                  self.delegate.options.sources.gravatar.enabled = false;
+                  self.delegate.options.sources.facebook.enabled = false;
                 } catch(err) {}
               }
           })
