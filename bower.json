@@ -1,0 +1,32 @@
+{
+  "name": "tapatar",
+  "version": "1.0.0",
+  "homepage": "https://tapfiliate.com/open-source/tapatar/",
+  "authors": [
+    "Thomas van der Kleij <thomas@tapfiliate.com>"
+  ],
+  "description": "A better avatar picker by Tapfiliate.",
+  "main": "dist/tapatar.min.js",
+  "moduleType": [
+    "amd",
+    "globals"
+  ],
+  "keywords": [
+    "tapatar",
+    "avatar",
+    "avatar picker",
+    "avatar selection",
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:tapfiliate/tapatar.git"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "license": "MIT"
+}
