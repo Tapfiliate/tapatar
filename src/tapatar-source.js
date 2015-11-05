@@ -51,6 +51,10 @@
             callback(null, 'error', this.status);
           }
         };
+        
+        xhr.onerror = xhr.onabort = function(e) {
+            callback(null, 'error', e.error);
+        };
 
         xhr.send();
     }
