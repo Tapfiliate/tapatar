@@ -17,8 +17,14 @@
             templates: {
                 widget: '<div class="tptr-widget"><span class="tptr-widget-pick">pick</span></div>',
                 overlay: '<div class="tptr-container" style="display: none"><div class="tptr-overlay"></div></div>',
-                picker: '<div class="tptr-picker"><div class="tptr-close"></div><div class="tptr-image-holder tptr-box-part"><div class="tptr-big-image"> </div></div><div class="tptr-sources-holder tptr-box-part"><div class="tptr-sources"></div><button class="tptr-save">Save</button></div></div>',
+                picker: '<div class="tptr-picker"><div class="tptr-close"></div><div class="tptr-image-holder tptr-box-part"><img class="tptr-big-image"></div><div class="tptr-sources-holder tptr-box-part"><div class="tptr-sources"></div><button class="tptr-save">Save</button></div></div>',
                 source: '<div class="tptr-source"><div class="tptr-source-part tptr-source-icon"><img /></div><div class="tptr-source-part tptr-source-content"></div><div class="tptr-source-part tptr-source-image-preview"></div><button class="tptr-source-part tptr-source-pick">Pick</button></div>'
+            },
+            cropper: {
+                enabled: false,
+                options: {
+                    // https://github.com/fengyuanchen/cropper
+                }
             }
         };
 
@@ -82,6 +88,7 @@
         pickSource: function(source) {
             this.selectedSource = source.id;
             this._setPickedImage(source);
+            if (this.options.cropper.enabled) this._addCropper(source);
         },
         imageDataSet: function(source, pick) {
             this._updateSourceUi(source);
@@ -118,7 +125,7 @@
         },
         _setPickedImage: function(source) {
             if (!source.image_data) return;
-            this.$containerEl.find('.tptr-image-holder .tptr-big-image').css('background-image', 'url(' + source.image_data + ')');
+            this.$containerEl.find('.tptr-big-image').attr('src', source.image_data);
         },
         _popPicker: function() {
             var sources = '';
@@ -127,7 +134,7 @@
             var imageData = (this.selectedSource)
                                 ? this.sources[this.selectedSource].image_data
                                 : this._getImageFromPathOrFunction(this.options.default_image, this.options);
-            $picker.find('.tptr-big-image').css('background-image', 'url(' + imageData + ')');
+            $picker.find('.tptr-big-image').attr('src', imageData);
 
             // Sort sources and append
             var $sourcesHolder = $picker.find('.tptr-sources');
@@ -179,6 +186,17 @@
             }
 
             return $el;
+        },
+        _addCropper: function(source) {
+            var $img = this.$containerEl.find('.tptr-big-image');
+            $img
+                .cropper(this.options.cropper.options)
+                .on('crop.cropper', this._cropEvent.bind(this, source, $img));
+        },
+        _cropEvent: function(source, $img) {
+            source.image_data = $img.cropper('getCroppedCanvas').toDataURL();
+            this._setPickedImage(source);
+            this._setPreviewImage(source);
         },
         _getSourceEl: function (source) {
             return this.$containerEl.find('[data-source-id=' + source.id +']');
