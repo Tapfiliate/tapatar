@@ -194,9 +194,8 @@
                 .on('crop.cropper', this._cropEvent.bind(this, source, $img));
         },
         _cropEvent: function(source, $img) {
-            source.image_data = $img.cropper('getCroppedCanvas').toDataURL();
+            source.setImageData($img.cropper('getCroppedCanvas').toDataURL());
             this._setPickedImage(source);
-            this._setPreviewImage(source);
         },
         _getSourceEl: function (source) {
             return this.$containerEl.find('[data-source-id=' + source.id +']');
