@@ -60,7 +60,7 @@
             this.$tptrEl = $(this.element).parent();
             var $innerEl = $('<div class="tptr-inner"></div>');
             this.$tptrEl.append('<div class="tptr-inner"></div>');
-            var $innerEl = this.$tptrEl.find('.tptr-inner');
+            $innerEl = this.$tptrEl.find('.tptr-inner');
 
             var self = this;
 
@@ -128,8 +128,6 @@
             this.$containerEl.find('.tptr-big-image').attr('src', source.image_data);
         },
         _popPicker: function() {
-            var sources = '';
-
             var $picker = $(this.options.templates.picker);
             var imageData = (this.selectedSource)
                                 ? this.sources[this.selectedSource].image_data
@@ -147,17 +145,15 @@
             sorted.reverse();
 
             for (var i = sorted.length - 1; i >= 0; i--) {
-                var source = this.sources[sorted[i][0]];
+                source = this.sources[sorted[i][0]];
                 if (source && this.options.sources[source.id].enabled) {
                     $sourcesHolder.append($(this._buildSource(source)));
                 }
-            };
+            }
 
             var $overlay = $(this.options.templates.overlay);
             $overlay.find('.tptr-overlay').html($picker);
             $('body').append($overlay);
-
-            var self = this;
 
             this.pickerActive = true;
             $overlay.fadeIn();
@@ -190,6 +186,7 @@
         _addCropper: function(source) {
             var $img = this.$containerEl.find('.tptr-big-image');
             $img
+                .cropper('destroy')
                 .cropper(this.options.cropper.options)
                 .on('crop.cropper', this._cropEvent.bind(this, source, $img));
         },
@@ -203,7 +200,7 @@
         _updateAllSourcesUi: function() {
             for (var source in this.sources) {
                 this._updateSourceUi(this.sources[source])
-            };
+            }
         },
         _updateSourceUi: function(source) {
             if (!this.pickerActive) return;
@@ -236,7 +233,7 @@
         } else if (typeof options === 'string' && options[0] !== '_' && options !== 'init') {
             // Call a public plugin method (not starting with an underscore) for each
             // selected element.
-            if (Array.prototype.slice.call(args, 1).length == 0 && $.inArray(options, $.fn[pluginName].getters) != -1) {
+            if (Array.prototype.slice.call(args, 1).length === 0 && $.inArray(options, $.fn[pluginName].getters) != -1) {
                 // If the user does not pass any arguments and the method allows to
                 // work as a getter then break the chainability so we can return a value
                 // instead the element reference.
