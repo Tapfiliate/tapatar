@@ -23,6 +23,7 @@
             cropper: {
                 enabled: false,
                 options: {
+                    autoCropArea: 1.0
                     // https://github.com/fengyuanchen/cropper
                 }
             }
@@ -129,10 +130,6 @@
         },
         _popPicker: function() {
             var $picker = $(this.options.templates.picker);
-            var imageData = (this.selectedSource)
-                                ? this.sources[this.selectedSource].image_data
-                                : this._getImageFromPathOrFunction(this.options.default_image, this.options);
-            $picker.find('.tptr-big-image').attr('src', imageData);
 
             // Sort sources and append
             var $sourcesHolder = $picker.find('.tptr-sources');
@@ -158,6 +155,22 @@
             this.pickerActive = true;
             $overlay.fadeIn();
             this.$containerEl = $overlay;
+
+            if (this.selectedSource) { // recover chosen image
+                var $widget = this.$tptrEl.find('.tptr-widget'),
+                    data = $widget.data('original'),
+                    cropData = $widget.data('crop-data');
+
+                if (data)
+                    this.sources[this.selectedSource].image_data = data;
+                if (cropData)
+                    this.options.cropper.options.data = cropData;
+
+                this.pickSource(this.sources[this.selectedSource]);
+            } else { // or use default
+                $picker.find('.tptr-big-image').attr('src', this._getImageFromPathOrFunction(this.options.default_image, this.options));
+            }
+
             this._updateAllSourcesUi();
         },
         _closePicker: function() {
@@ -185,12 +198,15 @@
         },
         _addCropper: function(source) {
             var $img = this.$containerEl.find('.tptr-big-image');
+            this.$tptrEl.find('.tptr-widget').data('original', $img.prop('src'));
+
             $img
                 .cropper('destroy')
                 .cropper(this.options.cropper.options)
                 .on('crop.cropper', this._cropEvent.bind(this, source, $img));
         },
         _cropEvent: function(source, $img) {
+            this.$tptrEl.find('.tptr-widget').data('crop-data', $img.cropper('getData'));
             source.setImageData($img.cropper('getCroppedCanvas').toDataURL());
             this._setPickedImage(source);
         },
