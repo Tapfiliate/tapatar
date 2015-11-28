@@ -18,6 +18,16 @@
     display: flex;
 }
 
+.tptr-flex-center() {
+    -webkit-align-items: center;
+        -ms-flex-align: center;
+             align-items: center;
+
+    -webkit-justify-content: center;
+        -ms-flex-pack: center;
+             justify-content: center;
+}
+
 .tptr-widget {
     font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     height: 70px;
@@ -25,7 +35,9 @@
     border-radius: 35px;
     -webkit-border-radius: 35px;
     -moz-border-radius: 35px;
-    background-size: cover;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: 50%;
     display: block;
     overflow: hidden;
     position: relative;
@@ -66,6 +78,7 @@
 
     .tptr-overlay {
         .tptr-flex();
+        .tptr-flex-center();
         position: fixed;
         top: 0;
         left: 0;
@@ -73,14 +86,6 @@
         right: 0;
         background-color: @tptr-color-overlay;
         z-index: 101;
-
-        -webkit-align-items: center;
-             -ms-flex-align: center;
-                align-items: center;
-
-        -webkit-justify-content: center;
-                  -ms-flex-pack: center;
-                justify-content: center;
 
         .tptr-picker {
             .tptr-flex();
@@ -129,11 +134,9 @@
                 }
 
                 .tptr-big-image {
-                    width: 100%;
-                    height: 0;
-                    padding-top: 100%;
-                    background-size: cover;
                     display: block;
+                    margin: auto;
+                    width: 100%;
                 }
             }
 
@@ -164,7 +167,7 @@
                     margin-bottom: @source-padding;
                     .clearfix();
 
-                    .tptr-source-part, {
+                    .tptr-source-part {
                         float: left;
                         background-color: @tptr-color-gray-accent;
                         height: @source-height;
@@ -208,8 +211,9 @@
                             width: @source-height;
                             height: 0;
                             padding-top: 100%;
-                            background-size: cover;
-                            display: block;
+                            background-size: contain;
+                            background-repeat: no-repeat;
+                            background-position: 50%;
                         }
                     }
                 }

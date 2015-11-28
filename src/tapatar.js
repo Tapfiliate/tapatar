@@ -17,8 +17,15 @@
             templates: {
                 widget: '<div class="tptr-widget"><span class="tptr-widget-pick">pick</span></div>',
                 overlay: '<div class="tptr-container" style="display: none"><div class="tptr-overlay"></div></div>',
-                picker: '<div class="tptr-picker"><div class="tptr-close"></div><div class="tptr-image-holder tptr-box-part"><div class="tptr-big-image"> </div></div><div class="tptr-sources-holder tptr-box-part"><div class="tptr-sources"></div><button class="tptr-save">Save</button></div></div>',
+                picker: '<div class="tptr-picker"><div class="tptr-close"></div><div class="tptr-image-holder tptr-box-part"><img class="tptr-big-image"></div><div class="tptr-sources-holder tptr-box-part"><div class="tptr-sources"></div><button class="tptr-save">Save</button></div></div>',
                 source: '<div class="tptr-source"><div class="tptr-source-part tptr-source-icon"><img /></div><div class="tptr-source-part tptr-source-content"></div><div class="tptr-source-part tptr-source-image-preview"></div><button class="tptr-source-part tptr-source-pick">Pick</button></div>'
+            },
+            cropper: {
+                enabled: false,
+                options: {
+                    autoCropArea: 1.0
+                    // https://github.com/fengyuanchen/cropper
+                }
             }
         };
 
@@ -54,7 +61,7 @@
             this.$tptrEl = $(this.element).parent();
             var $innerEl = $('<div class="tptr-inner"></div>');
             this.$tptrEl.append('<div class="tptr-inner"></div>');
-            var $innerEl = this.$tptrEl.find('.tptr-inner');
+            $innerEl = this.$tptrEl.find('.tptr-inner');
 
             var self = this;
 
@@ -82,6 +89,7 @@
         pickSource: function(source) {
             this.selectedSource = source.id;
             this._setPickedImage(source);
+            if (this.options.cropper.enabled) this._addCropper(source);
         },
         imageDataSet: function(source, pick) {
             this._updateSourceUi(source);
@@ -118,16 +126,10 @@
         },
         _setPickedImage: function(source) {
             if (!source.image_data) return;
-            this.$containerEl.find('.tptr-image-holder .tptr-big-image').css('background-image', 'url(' + source.image_data + ')');
+            this.$containerEl.find('.tptr-big-image').attr('src', source.image_data);
         },
         _popPicker: function() {
-            var sources = '';
-
             var $picker = $(this.options.templates.picker);
-            var imageData = (this.selectedSource)
-                                ? this.sources[this.selectedSource].image_data
-                                : this._getImageFromPathOrFunction(this.options.default_image, this.options);
-            $picker.find('.tptr-big-image').css('background-image', 'url(' + imageData + ')');
 
             // Sort sources and append
             var $sourcesHolder = $picker.find('.tptr-sources');
@@ -140,21 +142,35 @@
             sorted.reverse();
 
             for (var i = sorted.length - 1; i >= 0; i--) {
-                var source = this.sources[sorted[i][0]];
+                source = this.sources[sorted[i][0]];
                 if (source && this.options.sources[source.id].enabled) {
                     $sourcesHolder.append($(this._buildSource(source)));
                 }
-            };
+            }
 
             var $overlay = $(this.options.templates.overlay);
             $overlay.find('.tptr-overlay').html($picker);
             $('body').append($overlay);
 
-            var self = this;
-
             this.pickerActive = true;
             $overlay.fadeIn();
             this.$containerEl = $overlay;
+
+            if (this.selectedSource) { // recover chosen image
+                var $widget = this.$tptrEl.find('.tptr-widget'),
+                    data = $widget.data('original'),
+                    cropData = $widget.data('crop-data');
+
+                if (data)
+                    this.sources[this.selectedSource].image_data = data;
+                if (cropData)
+                    this.options.cropper.options.data = cropData;
+
+                this.pickSource(this.sources[this.selectedSource]);
+            } else { // or use default
+                $picker.find('.tptr-big-image').attr('src', this._getImageFromPathOrFunction(this.options.default_image, this.options));
+            }
+
             this._updateAllSourcesUi();
         },
         _closePicker: function() {
@@ -180,13 +196,27 @@
 
             return $el;
         },
+        _addCropper: function(source) {
+            var $img = this.$containerEl.find('.tptr-big-image');
+            this.$tptrEl.find('.tptr-widget').data('original', $img.prop('src'));
+
+            $img
+                .cropper('destroy')
+                .cropper(this.options.cropper.options)
+                .on('crop.cropper', this._cropEvent.bind(this, source, $img));
+        },
+        _cropEvent: function(source, $img) {
+            this.$tptrEl.find('.tptr-widget').data('crop-data', $img.cropper('getData'));
+            source.setImageData($img.cropper('getCroppedCanvas').toDataURL());
+            this._setPickedImage(source);
+        },
         _getSourceEl: function (source) {
             return this.$containerEl.find('[data-source-id=' + source.id +']');
         },
         _updateAllSourcesUi: function() {
             for (var source in this.sources) {
                 this._updateSourceUi(this.sources[source])
-            };
+            }
         },
         _updateSourceUi: function(source) {
             if (!this.pickerActive) return;
@@ -219,7 +249,7 @@
         } else if (typeof options === 'string' && options[0] !== '_' && options !== 'init') {
             // Call a public plugin method (not starting with an underscore) for each
             // selected element.
-            if (Array.prototype.slice.call(args, 1).length == 0 && $.inArray(options, $.fn[pluginName].getters) != -1) {
+            if (Array.prototype.slice.call(args, 1).length === 0 && $.inArray(options, $.fn[pluginName].getters) != -1) {
                 // If the user does not pass any arguments and the method allows to
                 // work as a getter then break the chainability so we can return a value
                 // instead the element reference.
