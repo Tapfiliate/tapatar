@@ -22,9 +22,9 @@
             }
         };
 
-    function Plugin( element, options ) {
+    function Plugin(element, options) {
         this.element = element;
-        this.options = $.extend( true, defaults, options) ;
+        this.options = $.extend(true, {}, defaults, options);
         this._defaults = defaults;
         this._name = pluginName;
         this.sources = [];
@@ -62,8 +62,6 @@
             var $widgetTemplate = $(this.options.templates.widget);
             $widgetTemplate.css('background-image', 'url(' + this._getImageFromPathOrFunction(this.options.default_image, this.options) + ')');
 
-            this._registerHandlers();
-
             // Add the widget and attach the click handler
             $innerEl
                 .html($widgetTemplate)
@@ -72,6 +70,7 @@
                 });
         },
         registerSource: function(source) {
+            source = source.getInstance();
             if (!source.id) throw 'Source id missing';
             source.delegate = this;
 
@@ -91,19 +90,19 @@
             var self = this;
 
             // Register click handler for the sources' pick buttons and image preview
-            $(document).on('click', '.tptr-source-image-preview', function(){
+            this.$containerEl.on('click', '.tptr-source-image-preview', function(){
                 var sourceId = $(this).parents('[data-source-id]').data('source-id');
                 self.selectedSource = sourceId;
                 self._setPickedImage(self.sources[sourceId]);
             });
 
             // Register click handler for the save button
-            $(document).on('click', '.tptr-save', function() {
+            this.$containerEl.on('click', '.tptr-save', function() {
                 self._save();
             });
 
             // Register click handler for the save button
-            $(document).on('click', '.tptr-close', function() {
+            this.$containerEl.on('click', '.tptr-close', function() {
                 self._closePicker();
             });
 
@@ -155,6 +154,7 @@
             this.pickerActive = true;
             $overlay.fadeIn();
             this.$containerEl = $overlay;
+            this._registerHandlers();
             this._updateAllSourcesUi();
         },
         _closePicker: function() {

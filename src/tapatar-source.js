@@ -30,6 +30,10 @@
         this.delegate.pickSource(this);
     };
 
+    TapatarSource.prototype.getInstance = function() {
+        return $.extend(true, {}, this);
+    };
+
     TapatarSource.prototype.downloadImage = function(url, callback) {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);

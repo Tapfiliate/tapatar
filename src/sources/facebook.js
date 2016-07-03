@@ -40,12 +40,12 @@ Tptr.sources.facebook = new Tptr.TapatarSource({
   },
   onAdd: function() {
     var self = this;
-    window.fbAsyncInit = function() {
-      if (!self.delegate.options.sources.facebook.appId) {
-        this.delegate.options.sources.facebook.enabled = false;
+    if (!self.delegate.options.sources.facebook.appId) {
+        self.delegate.options.sources.facebook.enabled = false;
         return;
-      }
+    }
 
+    window.fbAsyncInit = function() {
       FB.init({
         appId      : self.delegate.options.sources.facebook.appId,
         xfbml      : true,
