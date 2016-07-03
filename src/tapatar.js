@@ -81,9 +81,11 @@
         pickSource: function(source) {
             this.selectedSource = source.id;
             this._setPickedImage(source);
+            $(this.element).trigger('tapatar.source.picked', [source]);
         },
         imageDataSet: function(source, pick) {
             this._updateSourceUi(source);
+            $(this.element).trigger('tapatar.source.image_data.set', [source]);
             if (pick === true) this.pickSource(source);
         },
         _registerHandlers: function() {
