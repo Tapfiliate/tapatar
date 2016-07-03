@@ -1,5 +1,5 @@
 /**
-  * Tapatar - 0.1
+  * Tapatar - 1.0.2
   * Copyright © 2015 Tapfiliate B.V.
   * Licensed under the MIT license.
   * https://tapfiliate.com/open-source/tapatar/
