@@ -201,9 +201,12 @@
             this._getSourceEl(source).find('.tptr-source-image-preview').html($('<div></div>').css('background-image', 'url(' + source.image_data + ')'));
         },
         _save: function() {
-            var imgData = this.sources[this.selectedSource].image_data;
-            $(this.element).val(imgData);
-            this.$tptrEl.find('.tptr-widget').css('background-image', 'url(' + imgData + ')');
+            if (this.sources[this.selectedSource]) {
+                var imgData = this.sources[this.selectedSource].image_data;
+                $(this.element).val(imgData);
+                this.$tptrEl.find('.tptr-widget').css('background-image', 'url(' + imgData + ')');
+            }
+
             this._closePicker();
         }
     };
