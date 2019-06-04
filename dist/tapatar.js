@@ -433,10 +433,13 @@ Tptr.sources.local = new Tptr.TapatarSource({
             this._getSourceEl(source).find('.tptr-source-image-preview').html($('<div></div>').css('background-image', 'url(' + source.image_data + ')'));
         },
         _save: function() {
-            if (this.sources[this.selectedSource]) {
-                var imgData = this.sources[this.selectedSource].image_data;
+            var source = this.sources[this.selectedSource];
+            if (source) {
+                var imgData = source.image_data;
                 $(this.element).val(imgData);
                 this.$tptrEl.find('.tptr-widget').css('background-image', 'url(' + imgData + ')');
+                
+                if(source.onSave) source.onSave(imgData);
             }
 
             this._closePicker();
