@@ -107,7 +107,8 @@
 
             // Register click handler for the save button
             $(document).on('click', '.tptr-save', function() {
-                self._save();
+                self.
+                ();
             });
 
             // Register click handler for the save button
@@ -229,6 +230,8 @@
             this._getSourceEl(source).find('.tptr-source-image-preview').html($('<div></div>').css('background-image', 'url(' + source.image_data + ')'));
         },
         _save: function() {
+            if (!this.sources[this.selectedSource]) return;
+            
             var imgData = this.sources[this.selectedSource].image_data;
             $(this.element).val(imgData);
             this.$tptrEl.find('.tptr-widget').css('background-image', 'url(' + imgData + ')');
